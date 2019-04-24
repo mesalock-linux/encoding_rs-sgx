@@ -679,7 +679,19 @@
 //! See the section [_UTF-16LE, UTF-16BE and Unicode Encoding Schemes_](#utf-16le-utf-16be-and-unicode-encoding-schemes)
 //! for discussion about the UTF-16 family.
 
+#![cfg_attr(all(feature = "mesalock_sgx", not(target_env = "sgx")), no_std)]
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
+
 #![cfg_attr(feature = "simd-accel", feature(stdsimd, core_intrinsics))]
+
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+#[macro_use]
+extern crate sgx_tstd as std;
+
+#[cfg(all(target_env = "sgx", target_vendor = "mesalock"))]
+extern crate core;
+
+use std::prelude::v1::*;
 
 #[macro_use]
 extern crate cfg_if;
@@ -711,6 +723,7 @@ mod macros;
 
 #[cfg(all(
     feature = "simd-accel",
+    not(feature = "mesalock_sgx"),
     any(
         target_feature = "sse2",
         all(target_endian = "little", target_arch = "aarch64"),
@@ -718,6 +731,15 @@ mod macros;
     )
 ))]
 mod simd_funcs;
+
+#[cfg(all(feature = "mesalock_sgx",
+          feature = "simd-accel",
+          any(
+              target_feature = "sse2",
+              all(target_endian = "little", target_arch = "aarch64"),
+              all(target_endian = "little", target_feature = "neon"))
+          ))]
+pub mod simd_funcs;
 
 #[cfg(test)]
 mod testing;
@@ -734,7 +756,14 @@ mod utf_16;
 mod utf_8;
 mod x_user_defined;
 
+#[cfg(feature = "mesalock_sgx")]
+pub mod ascii;
+#[cfg(not(feature = "mesalock_sgx"))]
 mod ascii;
+
+#[cfg(feature = "mesalock_sgx")]
+pub mod data;
+#[cfg(not(feature = "mesalock_sgx"))]
 mod data;
 mod handles;
 mod variant;
@@ -2845,8 +2874,8 @@ impl Encoding {
         self.output_encoding() == UTF_8
     }
 
-    /// Checks whether the bytes 0x00...0x7F map exclusively to the characters
-    /// U+0000...U+007F and vice versa.
+    /// Checks whether the bytes 0x00..=0x7F map exclusively to the characters
+    /// U+0000..=U+007F and vice versa.
     ///
     /// Available via the C wrapper.
     #[inline]
@@ -2868,8 +2897,8 @@ impl Encoding {
         self.variant.is_single_byte()
     }
 
-    /// Checks whether the bytes 0x00...0x7F map mostly to the characters
-    /// U+0000...U+007F and vice versa.
+    /// Checks whether the bytes 0x00..=0x7F map mostly to the characters
+    /// U+0000..=U+007F and vice versa.
     #[inline]
     fn is_potentially_borrowable(&'static self) -> bool {
         !(self == REPLACEMENT || self == UTF_16BE || self == UTF_16LE)

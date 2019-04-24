@@ -24,6 +24,7 @@
 //! The FFI binding for this module are in the
 //! [encoding_c_mem crate](https://github.com/hsivonen/encoding_c_mem).
 
+use std::prelude::v1::*;
 use std::borrow::Cow;
 
 use super::in_inclusive_range16;
@@ -46,12 +47,12 @@ cfg_if! {
     } else {
         #[inline(always)]
         // Unsafe to match the intrinsic, which is needlessly unsafe.
-        unsafe fn likely(b: bool) -> bool {
+        fn likely(b: bool) -> bool {
             b
         }
         #[inline(always)]
         // Unsafe to match the intrinsic, which is needlessly unsafe.
-        unsafe fn unlikely(b: bool) -> bool {
+        fn unlikely(b: bool) -> bool {
             b
         }
     }
@@ -910,7 +911,7 @@ pub fn is_utf8_bidi(buffer: &[u8]) -> bool {
                             {
                                 return true;
                             }
-                            if unsafe { unlikely(second == 0x90 || second == 0x9E) } {
+                            if unlikely(second == 0x90 || second == 0x9E) {
                                 let third = src[read + 2];
                                 if third >= 0xA0 {
                                     return true;
@@ -1168,7 +1169,7 @@ pub fn is_str_bidi(buffer: &str) -> bool {
                         // Two-byte
                         // Adding `unlikely` here improved throughput on
                         // Russian plain text by 33%!
-                        if unsafe { unlikely(byte >= 0xD6) } {
+                        if unlikely(byte >= 0xD6) {
                             if byte == 0xD6 {
                                 let second = bytes[read + 1];
                                 if second > 0x8F {
@@ -1192,7 +1193,7 @@ pub fn is_str_bidi(buffer: &str) -> bool {
                     }
                 } else if byte < 0xF0 {
                     // Three-byte
-                    if unsafe { unlikely(!in_inclusive_range8(byte, 0xE3, 0xEE) && byte != 0xE1) } {
+                    if unlikely(!in_inclusive_range8(byte, 0xE3, 0xEE) && byte != 0xE1) {
                         let second = bytes[read + 1];
                         if byte == 0xE0 {
                             if second < 0xA4 {
@@ -1241,7 +1242,7 @@ pub fn is_str_bidi(buffer: &str) -> bool {
                 } else {
                     // Four-byte
                     let second = bytes[read + 1];
-                    if unsafe { unlikely(byte == 0xF0 && (second == 0x90 || second == 0x9E)) } {
+                    if unlikely(byte == 0xF0 && (second == 0x90 || second == 0x9E)) {
                         let third = bytes[read + 2];
                         if third >= 0xA0 {
                             return true;
@@ -1308,15 +1309,15 @@ pub fn is_char_bidi(c: char) -> bool {
     //
     // BMP RTL:
     // https://www.unicode.org/roadmaps/bmp/
-    // U+0590...U+08FF
-    // U+FB1D...U+FDFF Hebrew presentation forms and
+    // U+0590..=U+08FF
+    // U+FB1D..=U+FDFF Hebrew presentation forms and
     //                 Arabic Presentation Forms A
-    // U+FE70...U+FEFE Arabic Presentation Forms B (excl. BOM)
+    // U+FE70..=U+FEFE Arabic Presentation Forms B (excl. BOM)
     //
     // Supplementary RTL:
     // https://www.unicode.org/roadmaps/smp/
-    // U+10800...U+10FFF (Lead surrogate U+D802 or U+D803)
-    // U+1E800...U+1EFFF (Lead surrogate U+D83A or U+D83B)
+    // U+10800..=U+10FFF (Lead surrogate U+D802 or U+D803)
+    // U+1E800..=U+1EFFF (Lead surrogate U+D83A or U+D83B)
     let code_point = u32::from(c);
     if code_point < 0x0590 {
         // Below Hebrew
@@ -1655,7 +1656,7 @@ pub fn convert_utf16_to_utf8_partial(src: &[u16], dst: &mut [u8]) -> (usize, usi
     // basic blocks out-of-lined to the end of the function would wipe
     // away a quarter of Arabic encode performance on Haswell!
     let (read, written) = convert_utf16_to_utf8_partial_inner(src, dst);
-    if unsafe { likely(read == src.len()) } {
+    if likely(read == src.len()) {
         return (read, written);
     }
     let (tail_read, tail_written) =
