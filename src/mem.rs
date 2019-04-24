@@ -24,6 +24,7 @@
 //! The FFI binding for this module are in the
 //! [encoding_c_mem crate](https://github.com/hsivonen/encoding_c_mem).
 
+use std::prelude::v1::*;
 use std::borrow::Cow;
 
 use super::in_inclusive_range16;
