@@ -314,22 +314,22 @@ pub fn test_utf16_valid_up_to() {
         0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0x2603u16,
         0xD83Du16, 0xDCA9u16, 0x00B6u16,
     ];
-    assert_eq!(utf16_valid_up_to(&valid[..]), 16);;
+    assert_eq!(utf16_valid_up_to(&valid[..]), 16);
     let lone_high = vec![
         0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16,
         0x2603u16, 0xD83Du16, 0x00B6u16,
     ];
-    assert_eq!(utf16_valid_up_to(&lone_high[..]), 14);;
+    assert_eq!(utf16_valid_up_to(&lone_high[..]), 14);
     let lone_low = vec![
         0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16,
         0x2603u16, 0xDCA9u16, 0x00B6u16,
     ];
-    assert_eq!(utf16_valid_up_to(&lone_low[..]), 14);;
+    assert_eq!(utf16_valid_up_to(&lone_low[..]), 14);
     let lone_high_at_end = vec![
         0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16, 0u16,
         0x2603u16, 0x00B6u16, 0xD83Du16,
     ];
-    assert_eq!(utf16_valid_up_to(&lone_high_at_end[..]), 15);;
+    assert_eq!(utf16_valid_up_to(&lone_high_at_end[..]), 15);
 }
 
 //#[test]
@@ -958,11 +958,11 @@ pub fn test_check_utf16_for_latin1_and_bidi() {
 #[inline(always)]
 pub fn reference_is_char_bidi(c: char) -> bool {
     match c {
-        '\u{0590}'...'\u{08FF}'
-        | '\u{FB1D}'...'\u{FDFF}'
-        | '\u{FE70}'...'\u{FEFE}'
-        | '\u{10800}'...'\u{10FFF}'
-        | '\u{1E800}'...'\u{1EFFF}'
+        '\u{0590}'..='\u{08FF}'
+        | '\u{FB1D}'..='\u{FDFF}'
+        | '\u{FE70}'..='\u{FEFE}'
+        | '\u{10800}'..='\u{10FFF}'
+        | '\u{1E800}'..='\u{1EFFF}'
         | '\u{200F}'
         | '\u{202B}'
         | '\u{202E}'
@@ -974,9 +974,9 @@ pub fn reference_is_char_bidi(c: char) -> bool {
 #[inline(always)]
 pub fn reference_is_utf16_code_unit_bidi(u: u16) -> bool {
     match u {
-        0x0590...0x08FF
-        | 0xFB1D...0xFDFF
-        | 0xFE70...0xFEFE
+        0x0590..=0x08FF
+        | 0xFB1D..=0xFDFF
+        | 0xFE70..=0xFEFE
         | 0xD802
         | 0xD803
         | 0xD83A

@@ -110,7 +110,7 @@ impl UnalignedU16Slice {
     pub fn at(&self, i: usize) -> u16 {
         assert!(i < self.len);
         unsafe {
-            let mut u: u16 = ::std::mem::uninitialized();
+            let mut u: u16 = ::std::mem::MaybeUninit::zeroed().assume_init();
             ::std::ptr::copy_nonoverlapping(self.ptr.add(i * 2), &mut u as *mut u16 as *mut u8, 2);
             u
         }

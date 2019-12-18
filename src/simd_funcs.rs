@@ -16,7 +16,7 @@ use packed_simd::FromBits;
 
 #[inline(always)]
 pub unsafe fn load16_unaligned(ptr: *const u8) -> u8x16 {
-    let mut simd = ::core::mem::uninitialized();
+    let mut simd = ::core::mem::MaybeUninit::zeroed().assume_init();
     ::core::ptr::copy_nonoverlapping(ptr, &mut simd as *mut u8x16 as *mut u8, 16);
     simd
 }
@@ -40,7 +40,7 @@ pub unsafe fn store16_aligned(ptr: *mut u8, s: u8x16) {
 
 #[inline(always)]
 pub unsafe fn load8_unaligned(ptr: *const u16) -> u16x8 {
-    let mut simd = ::core::mem::uninitialized();
+    let mut simd = ::core::mem::MaybeUninit::zeroed().assume_init();
     ::core::ptr::copy_nonoverlapping(ptr as *const u8, &mut simd as *mut u16x8 as *mut u8, 16);
     simd
 }

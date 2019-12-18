@@ -2712,12 +2712,12 @@ impl Encoding {
                         0x09u8 | 0x0Au8 | 0x0Cu8 | 0x0Du8 | 0x20u8 => {
                             continue;
                         }
-                        b'A'...b'Z' => {
+                        b'A'..=b'Z' => {
                             trimmed[trimmed_pos] = *byte + 0x20u8;
                             trimmed_pos = 1usize;
                             break;
                         }
-                        b'a'...b'z' | b'0'...b'9' | b'-' | b'_' | b':' | b'.' => {
+                        b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b':' | b'.' => {
                             trimmed[trimmed_pos] = *byte;
                             trimmed_pos = 1usize;
                             break;
@@ -2740,7 +2740,7 @@ impl Encoding {
                         0x09u8 | 0x0Au8 | 0x0Cu8 | 0x0Du8 | 0x20u8 => {
                             break;
                         }
-                        b'A'...b'Z' => {
+                        b'A'..=b'Z' => {
                             if trimmed_pos == LONGEST_LABEL_LENGTH {
                                 // There's no encoding with a label this long
                                 return None;
@@ -2749,7 +2749,7 @@ impl Encoding {
                             trimmed_pos += 1usize;
                             continue;
                         }
-                        b'a'...b'z' | b'0'...b'9' | b'-' | b'_' | b':' | b'.' => {
+                        b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b':' | b'.' => {
                             if trimmed_pos == LONGEST_LABEL_LENGTH {
                                 // There's no encoding with a label this long
                                 return None;
@@ -2872,8 +2872,8 @@ impl Encoding {
         self.output_encoding() == UTF_8
     }
 
-    /// Checks whether the bytes 0x00...0x7F map exclusively to the characters
-    /// U+0000...U+007F and vice versa.
+    /// Checks whether the bytes 0x00..=0x7F map exclusively to the characters
+    /// U+0000..=U+007F and vice versa.
     ///
     /// Available via the C wrapper.
     #[inline]
@@ -2895,8 +2895,8 @@ impl Encoding {
         self.variant.is_single_byte()
     }
 
-    /// Checks whether the bytes 0x00...0x7F map mostly to the characters
-    /// U+0000...U+007F and vice versa.
+    /// Checks whether the bytes 0x00..=0x7F map mostly to the characters
+    /// U+0000..=U+007F and vice versa.
     #[inline]
     fn is_potentially_borrowable(&'static self) -> bool {
         !(self == REPLACEMENT || self == UTF_16BE || self == UTF_16LE)
